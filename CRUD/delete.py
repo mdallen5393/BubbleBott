@@ -1,9 +1,6 @@
 #!/usr/bin/env python
-import main
 from main import db
 import read
-import firebase_admin
-from firebase_admin import credentials, firestore
 
 def delete_resource(bubble_name, resource_idx):
     bubbleID = read.get_bubble_id(bubble_name)

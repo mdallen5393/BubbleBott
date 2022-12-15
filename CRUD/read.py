@@ -1,8 +1,5 @@
 #!/usr/bin/env python
-import main
 from main import db
-import firebase_admin
-from firebase_admin import credentials, firestore
 
 def get_bubble_id(bubble_name):
     return db.collection('bubbles').where('name', '==', bubble_name).get()[0].id
