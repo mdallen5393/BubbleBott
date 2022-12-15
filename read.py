@@ -1,12 +1,11 @@
 #!/usr/bin/env python
+import main
+from main import db
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-cred = credentials.Certificate("serviceAccountKey.json")
-firebase_admin.initialize_app(cred)
-
-db = firestore.client()
-
+def get_bubble_id(bubble_name):
+    return db.collection('bubbles').where('name', '==', bubble_name).get()[0].id
 
 def get_bubble(bubble_name='bubbles'):
     # Get a specific bubble
@@ -23,18 +22,18 @@ def get_bubble(bubble_name='bubbles'):
 
 def get_bubble_resources(bubble_name):
     # Get all resources in a bubble
-    docID = db.collection('bubbles').where('name', '==', bubble_name).get()[0].id
+    docID = get_bubble_id(bubble_name)
     docs = db.collection('bubbles').document(docID).collection('resources').get()
     resources = []
     for doc in docs:
         resources.append(doc.to_dict())
     return resources
 
-print("Print all bubbles:")
-print(get_bubble())
-print('-'*20)
-print("Print the 'firestore' bubble:")
-print(get_bubble('firestore'))
-print('-'*20)
-print("Print all resources in the 'firestore' bubble:")
-print(get_bubble_resources('firestore'))
+# print("Print all bubbles:")
+# print(get_bubble())
+# print('-'*20)
+# print("Print the 'firestore' bubble:")
+# print(get_bubble('firestore'))
+# print('-'*20)
+# print("Print all resources in the 'firestore' bubble:")
+# print(get_bubble_resources('test'))
