@@ -1,13 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # import read
 from __init__ import db
 from firebase_admin import firestore
 from read import get_bubble_resources, get_bubble_id
 
-def add_bubble(name, owner, desc):
-    if not name:
+def add_bubble(bubble_name, owner, desc):
+    if not bubble_name:
         return 'Usage: add_bubble(name, owner, desc)'
-    db.collection('bubbles').add({'name': name, 'owner':owner, 'description':desc, 'createdAt':firestore.SERVER_TIMESTAMP})
+    db.collection('bubbles').add({'bubble_name': bubble_name, 'owner':owner, 'description':desc, 'createdAt':firestore.SERVER_TIMESTAMP})
 
 def new_resource_id(bubble_name):
     return len(get_bubble_resources(bubble_name))

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # NOTE: bid = bubble ID; rid = resource ID
 
 import os
@@ -7,12 +8,17 @@ from __init__ import db, app
 # import create, read, update, delete
 from create import add_resource, new_resource_id
 from read import get_bubble_id, get_bubble_resources
-from delete import deleteResource
+from delete import delete_resource
 
 bubbles_ref = db.collection('bubbles')
 
+@app.route('/', methods=['GET'])
+def get_connected():
+    print('hello!')
+    return jsonify({"success": True}), 200
+
 @app.route('/add_bubble', methods=['POST', 'GET'])
-def create_bubble():
+def add_bubble():
     """
     Add bubble
     Usage: curl '127.0.0.1:8080/add_bubble?name=hi&owner=matt&desc=testing+add+bubble'
@@ -39,7 +45,7 @@ def get_id():
         return f'An error occurred: {e}\n'
 
 @app.route('/add_resource', methods=['POST', 'GET'])
-def create_resource():
+def add_resource():
     """
     Add resource to bubble
     """
@@ -119,7 +125,7 @@ def update_resource():
         return f'An error occurred: {e}\n'
 
 @app.route('/delete_bubble', methods=['GET', 'DELETE'])
-def delete_bubble():
+def pop_bubble():
     """
     Delete a bubble
     """
@@ -133,7 +139,7 @@ def delete_bubble():
         return f'An error occurred: {e}\n'
 
 @app.route('/delete_resource', methods=['GET', 'DELETE'])
-def delete_resource():
+def pop_resource():
     try:
         bubble_name = request.args.get('bubble_name')
         if not bubble_name:
@@ -142,11 +148,11 @@ def delete_resource():
         if not idx:
             raise Exception('must include idx')
         idx = int(idx)
-        deleteResource(bubble_name, idx)
+        delete_resource(bubble_name, idx)
         return jsonify({"success": True}), 200
     except Exception as e:
         return f'An error occurred: {e}\n'
 
-port = int(os.environ.get('PORT', 8080))
+port = int(os.environ.get('PORT', 5000))
 if __name__ == '__main__':
     app.run(threaded=True, host='0.0.0.0', port=port)

@@ -1,8 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from __init__ import db
 from read import get_bubble_id
 
-def deleteResource(bubble_name, resource_idx):
+def delete_resource(bubble_name, resource_idx):
     bubbleID = get_bubble_id(bubble_name)
     if not bubbleID:
         raise Exception(f'bubble \'{bubble_name}\' not found')

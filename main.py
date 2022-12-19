@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import create, read, update, delete
 
 if __name__ == '__main__':

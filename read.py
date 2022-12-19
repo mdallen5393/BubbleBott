@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from __init__ import db
 
 def get_bubble_id(bubble_name):
@@ -13,7 +13,7 @@ def get_bubble(bubble_name='bubbles'):
     if bubble_name != 'bubbles':
         doc = db.collection('bubbles').where('name', '==', bubble_name).get()
         if not doc.exists:
-            return f'bubble {bubble_name} does not exist'
+            raise Exception(f'bubble {bubble_name} does not exist')
         return (doc[0].to_dict())
 
     # Get all bubbles
