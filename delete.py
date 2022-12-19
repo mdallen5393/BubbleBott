@@ -2,13 +2,13 @@
 from __init__ import db
 from read import get_bubble_id
 
-def delete_resource(bubble_name, resource_idx):
+def deleteResource(bubble_name, resource_idx):
     bubbleID = get_bubble_id(bubble_name)
     if not bubbleID:
-        return f'bubble {bubble_name} not found'
+        raise Exception(f'bubble \'{bubble_name}\' not found')
     resource = db.collection('bubbles').document(bubbleID).collection('resources').where('idx', '==', resource_idx).get()
     if not resource:
-        return f'resource [{resource_idx}] not found'
+        raise Exception(f'resource \'{resource_idx}\' not found in bubble \'bubble_name\'')
     resourceID = resource[0].id
     db.collection('bubbles').document(bubbleID).collection('resources').document(resourceID).delete()
     return f'deleted {bubble_name} resource [{resource_idx}] successfully'

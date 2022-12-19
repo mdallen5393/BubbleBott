@@ -7,6 +7,7 @@ from __init__ import db, app
 # import create, read, update, delete
 from create import add_resource, new_resource_id
 from read import get_bubble_id, get_bubble_resources
+from delete import deleteResource
 
 bubbles_ref = db.collection('bubbles')
 
@@ -17,12 +18,12 @@ def create_bubble():
     Usage: curl '127.0.0.1:8080/add_bubble?name=hi&owner=matt&desc=testing+add+bubble'
     """
     try:
-        name = request.args.get('name')
+        bubble_name = request.args.get('bubble_name')
         owner = request.args.get('owner')
         desc = request.args.get('desc')
-        if not name:
+        if not bubble_name:
             raise Exception("must include a name")
-        bubbles_ref.add({'name': name, 'owner':owner, 'description':desc, 'createdAt':firestore.SERVER_TIMESTAMP})
+        bubbles_ref.add({'name': bubble_name, 'owner':owner, 'description':desc, 'createdAt':firestore.SERVER_TIMESTAMP})
         return jsonify({"success": True}), 200
     except Exception as e:
         return f'An error occurred: {e}\n'
@@ -30,10 +31,10 @@ def create_bubble():
 @app.route('/get_id', methods=['GET'])
 def get_id():
     try:
-        name = request.args.get('name')
-        if not name:
+        bubble_name = request.args.get('bubble_name')
+        if not bubble_name:
             raise Exception("must include name")
-        return get_bubble_id(name)
+        return get_bubble_id(bubble_name)
     except Exception as e:
         return f'An error occurred: {e}\n'
 
@@ -64,7 +65,7 @@ def read():
     Fetch all bubbles
     """
     try:
-        bubble_name = request.args.get('name')
+        bubble_name = request.args.get('bubble_name')
         if not bubble_name:
             all_bubbles = [doc.to_dict() for doc in bubbles_ref.stream()]
             return jsonify(all_bubbles), 200
@@ -80,7 +81,7 @@ def read():
 @app.route('/list_resources', methods=['GET'])
 def get_resources():
     try:
-        bubble_name = request.args.get('name')
+        bubble_name = request.args.get('bubble_name')
         if not bubble_name:
             raise Exception('must specify a bubble')
         resources = get_bubble_resources(bubble_name)
@@ -90,20 +91,20 @@ def get_resources():
     except Exception as e:
         return f'An Error Occurred: {e}\n'
 
-@app.route('/update/bubble', methods=['POST', 'PUT'])
+@app.route('/update_bubble', methods=['POST', 'PUT', 'GET'])
 def update_bubble():
     """
     Update bubble
     """
     try:
-        bubble_name = request.args.get('name')
+        bubble_name = request.args.get('bubble_name')
         bid = get_bubble_id(bubble_name)
         bubbles_ref.document(bid).update(request.json)
         return jsonify({"success": True}), 200
     except Exception as e:
         return f'An error occurred: {e}'
 
-@app.route('/update/resource', methods=['POST', 'PUT', 'GET'])
+@app.route('/update_resource', methods=['POST', 'PUT', 'GET'])
 def update_resource():
     try:
         bubble_name = request.args.get('bubble_name')
@@ -111,35 +112,37 @@ def update_resource():
         rid = request.args.get('rid')
         resource_path = bubbles_ref.document(bid).collection('resources').document(rid).get()
         if not resource_path.exists:
-            raise Exception(f'rid \'{rid}\' does not exist in bubble \'{bubble_name}\' at path {resource_path}') # FIXME: does not recognize RID
+            raise Exception(f'rid \'{rid}\' does not exist in bubble \'{bubble_name}\' at path {resource_path}')
         resource_path.update(request.json)
         return jsonify({'success': True}), 200
     except Exception as e:
         return f'An error occurred: {e}\n'
 
-@app.route('/delete/bubble', methods=['GET', 'DELETE'])
+@app.route('/delete_bubble', methods=['GET', 'DELETE'])
 def delete_bubble():
     """
     Delete a bubble
     """
     try:
         #Check if ID was passed to URL query
-        bubble_name = request.args.get('name')
+        bubble_name = request.args.get('bubble_name')
         bid = get_bubble_id(bubble_name)
         bubbles_ref.document(bid).delete()
         return jsonify({"success": True}), 200
     except Exception as e:
         return f'An error occurred: {e}\n'
 
-@app.route('/delete/resource', methods=['GET', 'DELETE'])
+@app.route('/delete_resource', methods=['GET', 'DELETE'])
 def delete_resource():
     try:
         bubble_name = request.args.get('bubble_name')
-        bid = get_bubble_id(bubble_name)
-        idx = int(request.args.get('idx'))
-        resource = bubbles_ref.document(bid).collection('resources').where('idx', '==', idx).delete()#FIXME:HOLY FUCK I HATE CODING SOMETIMES
-        # return jsonify(resource)
-        # resource.delete()
+        if not bubble_name:
+            raise Exception('must include bubble_name')
+        idx = request.args.get('idx')
+        if not idx:
+            raise Exception('must include idx')
+        idx = int(idx)
+        deleteResource(bubble_name, idx)
         return jsonify({"success": True}), 200
     except Exception as e:
         return f'An error occurred: {e}\n'
