@@ -59,7 +59,7 @@ def create_resource():
     except Exception as e:
         return f'An error occurred: {e}\n'
 
-@app.route('/list', methods=['GET'])
+@app.route('/list_bubbles', methods=['GET'])
 def read():
     """
     Fetch all bubbles
