@@ -5,6 +5,8 @@ def get_bubble_id(bubble_name):
     bubble = db.collection('bubbles').where('name', '==', bubble_name).get()
     if bubble:
         return bubble[0].id
+    else:
+        raise Exception(f'bubble \'{bubble_name}\' not found')
 
 def get_bubble(bubble_name='bubbles'):
     # Get a specific bubble
@@ -26,11 +28,9 @@ def get_bubble(bubble_name='bubbles'):
 def get_bubble_resources(bubble_name):
     # Get all resources in a bubble
     docID = get_bubble_id(bubble_name)
-    if not docID:
-        return f'bubble {bubble_name} does not exist'
     docs = db.collection('bubbles').document(docID).collection('resources').get()
     if not docs:
-        return f'no resources in bubble {bubble_name}'
+        return []
     resources = []
     for doc in docs:
         resources.append(doc.to_dict())
