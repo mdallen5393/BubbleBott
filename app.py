@@ -58,7 +58,7 @@ def add_resource():
         content = request.args.get('content')
         owner = request.args.get('owner')
         desc = request.args.get('desc')
-        idx = new_resource_id('test')
+        idx = new_resource_id(bubble_name)
         json = {'content':content, 'owner':owner, 'description':desc, 'idx':idx, 'createdAt':firestore.SERVER_TIMESTAMP}
         bubbles_ref.document(bid).collection('resources').add(json)
         return jsonify({"success": True}), 200
